@@ -304,7 +304,7 @@ DEFINE_IOCTL(ioctl_ec_command) {
         unpack_bytes_le(in, ec_out_data, ec_out_size, 4 * 8, 0);
 
         status = ec_command_lpc_3(command, version, ec_out_data, ec_out_size, ec_in_data, ec_in_size, result);
-        if (status != STATUS_SUCCESS)
+        if (!NT_SUCCESS(status))
             return status;
 
         out[0] = result;
@@ -339,7 +339,7 @@ DEFINE_IOCTL(ioctl_ec_readmem) {
         return STATUS_BUFFER_TOO_SMALL;
 
     status = ec_readmem_lpc(offset, bytes, out_data);
-    if (status != STATUS_SUCCESS)
+    if (!NT_SUCCESS(status))
         return status;
 
     pack_bytes_le(out_data, out, bytes);

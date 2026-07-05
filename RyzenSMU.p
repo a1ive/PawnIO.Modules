@@ -453,18 +453,14 @@ NTSTATUS:get_pm_table_base(&base) {
 }
 
 new g_table_base;
-new g_table_version;
 new VA:g_table_va = NULL;
-new g_table_size;
 
 unmap_pm_table() {
     if (g_table_va) {
-        io_space_unmap(g_table_va, g_table_size);
+        io_space_unmap(g_table_va, PAGE_SIZE);
         g_table_va = NULL;
     }
-    g_table_size = 0;
     g_table_base = 0;
-    g_table_version = 0;
 }
 
 NTSTATUS:map_pm_table(table_base) {
@@ -476,7 +472,6 @@ NTSTATUS:map_pm_table(table_base) {
         return STATUS_COMMITMENT_LIMIT;
 
     g_table_va = table_va;
-    g_table_size = PAGE_SIZE;
     g_table_base = table_base;
     return STATUS_SUCCESS;
 }
@@ -523,11 +518,10 @@ DEFINE_IOCTL_SIZED(ioctl_resolve_pm_table, 0, 2) {
         return status;
     debug_print(''RyzenSMU: PM Table Base: %x\n'', table_base);
 
-    g_table_version = version;
     g_table_base = table_base;
 
-    out[0] = g_table_version;
-    out[1] = g_table_base;
+    out[0] = version;
+    out[1] = table_base;
 
     return STATUS_SUCCESS;
 }
@@ -564,7 +558,7 @@ DEFINE_IOCTL(ioctl_read_pm_table) {
             return map_status;
     }
 
-    new read_count = min(out_size, g_table_size / 8);
+    new read_count = min(out_size, PAGE_SIZE / 8);
     new NTSTATUS:status = STATUS_SUCCESS;
     new read;
     for (new i = 0; i < read_count; ++i) {

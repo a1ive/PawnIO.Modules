@@ -74,10 +74,10 @@ DEFINE_IOCTL_SIZED(ioctl_read_msr, 1, 1) {
 /// @warning You should acquire the "\BaseNamedObjects\Access_PCI" mutant before calling this
 DEFINE_IOCTL_SIZED(ioctl_get_thermtrip, 2, 1) {
     new cpu_idx = in[0];
-    if (cpu_idx > 1)
+    if (cpu_idx < 0 || cpu_idx > 1)
         return STATUS_INVALID_PARAMETER;
     new core_idx = in[1];
-    if (core_idx > 1)
+    if (core_idx < 0 || core_idx > 1)
         return STATUS_INVALID_PARAMETER;
 
     new device = PCI_BASE_DEVICE + cpu_idx;

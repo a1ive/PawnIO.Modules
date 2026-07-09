@@ -518,6 +518,9 @@ DEFINE_IOCTL_SIZED(ioctl_resolve_pm_table, 0, 2) {
         return status;
     debug_print(''RyzenSMU: PM Table Base: %x\n'', table_base);
 
+    if (g_table_base != table_base)
+        unmap_pm_table();
+
     g_table_base = table_base;
 
     out[0] = version;
